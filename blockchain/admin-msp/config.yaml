@@ -1,0 +1,5 @@
+NodeOUs:
+  Enable: true
+  AdminOUIdentifier:
+    Certificate: cacerts/<CERTIFICATE>.pem
+    OrganizationalUnitIdentifier: admin
