@@ -68,9 +68,6 @@ terraform apply plan.out
    Result: JSON payload with CAName, CAChain, IssuerRevocationPublicKey, and Version
 6. Setup the client
 ```bash
-sudo -i
-su ec2-user
-
 mkdir -p /home/ec2-user/go/src/github.com/hyperledger/fabric-ca
 cd /home/ec2-user/go/src/github.com/hyperledger/fabric-ca
 wget https://github.com/hyperledger/fabric-ca/releases/download/v1.4.7/hyperledger-fabric-ca-linux-amd64-1.4.7.tar.gz
@@ -82,7 +79,7 @@ cd /home/ec2-user
 git clone --branch v2.2.3 https://github.com/hyperledger/fabric-samples.git
 git clone https://github.com/semperfitodd/aws_blockchain_poc.git
 cp -r aws_blockchain_poc/blockchain/*.* .
-cp -r aws_blockchain_poc/blockchain/contract/ .
+cp -r aws_blockchain_poc/blockchain/src/* .
 cp -r aws_blockchain_poc/blockchain/admin-msp/ .
 ```
 
@@ -109,12 +106,14 @@ aws s3 cp s3://us-east-1.managedblockchain/etc/managedblockchain-tls-chain.pem  
 openssl x509 -noout -text -in /home/ec2-user/managedblockchain-tls-chain.pem
 
 # Enroll user
-source /home/ec2-user/.bash_profile
+ls admin-msp/cacerts/
+vim admin-msp/config.yaml
+# replace certificate name placeholder
 
 fabric-ca-client enroll \
   -u "https://admin:Password123@$CASERVICEENDPOINT" \
   --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M /home/ec2-user/admin-msp
- 
+
 docker exec cli configtxgen \
    -outputCreateChannelTx /opt/home/mychannel.pb \
    -profile OneOrgChannel -channelID mychannel \
@@ -127,14 +126,12 @@ cd /home/ec2-user
 
 vim configtx.yaml
 # replace MemberId with your MEMBER_ID
-# copy from /scripts/configtx.yaml to file replacing placeholder
-
-vim admin-msp/config.yaml
-# replace certificate name placeholder
 
 docker exec cli peer channel create -c mychannel \
    -f /opt/home/mychannel.pb -o $ORDERER \
    --cafile /opt/home/managedblockchain-tls-chain.pem --tls
+
+docker exec cli peer channel join -b mychannel.block
 ```
 Output should look something like this
 ```bash

@@ -3,7 +3,7 @@
 const shim = require('fabric-shim');
 const util = require('util');
 
-let Chaincode = class {
+class contract {
   async Init(stub) {
     console.info('========= Init =========');
     return shim.success();
@@ -37,6 +37,6 @@ let Chaincode = class {
 
     return Buffer.from(helloMessage);
   }
-};
+}
 
-shim.start(new Chaincode());
+shim.start(new contract());
