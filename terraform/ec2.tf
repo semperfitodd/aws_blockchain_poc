@@ -86,11 +86,6 @@ wget https://golang.org/dl/go1.16.7.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go1.16.7.linux-amd64.tar.gz
 
 # Update .bash_profile for ec2-user
-#!/bin/bash
-
-AWS_REGION=us-east-1
-MEMBER_ID=
-NETWORK_ID=
 
 sudo -u ec2-user bash -c "cat >> /home/ec2-user/.bash_profile <<EOL
 

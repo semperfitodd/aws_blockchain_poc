@@ -10,6 +10,7 @@
     "start": "fabric-chaincode-node start"
   },
   "engine-strict": true,
+  "main": "contract.js",
   "dependencies": {
     "fabric-shim": "2.2.0"
   },

@@ -80,12 +80,15 @@ echo 'export PATH=$PATH:/home/ec2-user/go/src/github.com/hyperledger/fabric-ca/b
 
 cd /home/ec2-user
 git clone --branch v2.2.3 https://github.com/hyperledger/fabric-samples.git
+git clone https://github.com/semperfitodd/aws_blockchain_poc.git
+cp -r aws_blockchain_poc/blockchain/*.* .
+cp -r aws_blockchain_poc/blockchain/contract/ .
+cp -r aws_blockchain_poc/blockchain/admin-msp/ .
 ```
 
 7. Setup CLI
 ```bash
 vim /home/ec2-user/docker-compose-cli.yaml
-# copy contents of scripts/docker-compose-cli.yaml into file
 # make sure to update placeholders MyMemberID and MyPeerNodeEndpoint
 # MyPeerNodeEndpoint is created by combining the following information <NODE_ID>.<MEMBER_ID>.<NETWORK_ID>.managedblockchain.us-east-1.amazonaws.com:30003
 # Network ID
@@ -126,9 +129,8 @@ vim configtx.yaml
 # replace MemberId with your MEMBER_ID
 # copy from /scripts/configtx.yaml to file replacing placeholder
 
-cd /home/ec2-user/admin-msp
-# replace MEMBER_ID and NETWORK_ID placeholders for certificate files
-# copy from /scripts/config.yaml to file replacing placeholders
+vim admin-msp/config.yaml
+# replace certificate name placeholder
 
 docker exec cli peer channel create -c mychannel \
    -f /opt/home/mychannel.pb -o $ORDERER \
@@ -143,26 +145,22 @@ Output should look something like this
 ```
 9. Package the chaincode
 ```bash
-mkdir -p /home/ec2-user/contract
-cd /home/ec2-user/contract
-# Create files from contract/*
+cd /home/ec2-user/src
 
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 nvm install 12
 nvm use 12
 npm install
 
 cd /home/ec2-user
-vim metadata.json
-# Copy scripts/metadata.json ocntents
 
-tar czf code.tar.gz contract
+tar czf code.tar.gz src
 tar czf contract.tar.gz code.tar.gz metadata.json 
-
-#docker exec cli peer lifecycle chaincode package contract.tar.gz \
-#   --path ./contract --lang node \
-#   --label contract_0
 ```
 10. Install the chaincode
 ```bash
@@ -179,12 +177,12 @@ export CC_PACKAGE_ID=<PACKAGE_ID>
 docker exec cli peer lifecycle chaincode approveformyorg \
    --orderer $ORDERER --tls --cafile /opt/home/managedblockchain-tls-chain.pem \
    --channelID mychannel --name mycc --version v0 --sequence 1 --package-id $CC_PACKAGE_ID
-   
+
 # Check readiness
 docker exec cli peer lifecycle chaincode checkcommitreadiness \
    --orderer $ORDERER --tls --cafile /opt/home/managedblockchain-tls-chain.pem \
    --channelID mychannel --name mycc --version v0 --sequence 1
-   
+
 # Commit the chaincode
 docker exec cli peer lifecycle chaincode commit \
    --orderer $ORDERER --tls --cafile /opt/home/managedblockchain-tls-chain.pem \
