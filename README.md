@@ -25,6 +25,7 @@ This guide provides steps to set up a smart contract proof of concept using AWS 
 * Terraform installed.
 
 ## Architecture
+![architecture.png](images%2Farchitecture.png)
 This POC will set up the following AWS resources:
 * VPC
 * EC2 instance and security group
