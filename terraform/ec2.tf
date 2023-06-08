@@ -82,8 +82,8 @@ sudo curl -L https://github.com/docker/compose/releases/download/1.20.0/docker-c
 sudo chmod a+x /usr/local/bin/docker-compose
 
 # Install Go
-wget https://golang.org/dl/go1.16.7.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.16.7.linux-amd64.tar.gz
+wget https://golang.org/dl/go1.14.4.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.14.4.linux-amd64.tar.gz
 
 # Update .bash_profile for ec2-user
 
