@@ -1,6 +1,5 @@
 # AWS Managed Blockchain for smart contract POC
 ## Table of Contents
-## Table of Contents
 1. [Introduction](#Introduction)
 2. [Prerequisites](#Prerequisites)
 3. [Architecture](#Architecture)
