@@ -108,14 +108,25 @@ This POC will set up the following AWS resources:
    ```bash
    vim /home/ec2-user/docker-compose-cli.yaml
    # make sure to update placeholders MyMemberID and MyPeerNodeEndpoint
-   # MyPeerNodeEndpoint is created by combining the following information <NODE_ID>.<MEMBER_ID>.<NETWORK_ID>.managedblockchain.us-east-1.amazonaws.com:30003
-   # Network ID
-   aws --region us-east-1 managedblockchain list-networks --output text --query 'Networks[*].Id'
-   # Member ID
-   aws --region us-east-1 managedblockchain list-members --network-id <NETWORK_ID> --output text --query 'Members[*].Id'
-   # Node ID
-   aws --region us-east-1 managedblockchain get-node --network-id <NETWORK_ID> --member-id <MEMBER_ID> --output text --query 'Nodes[*].Id'
+ 
+   # Set AWS region
+   REGION=us-east-1
    
+   # Get Network ID
+   NETWORK_ID=$(aws --region $REGION managedblockchain list-networks --output text --query 'Networks[0].Id')
+   
+   # Get Member ID
+   MEMBER_ID=$(aws --region $REGION managedblockchain list-members --network-id $NETWORK_ID --output text --query 'Members[0].Id')
+   
+   # Get Node ID
+   NODE_ID=$(aws --region $REGION managedblockchain list-nodes --network-id $NETWORK_ID --member-id $MEMBER_ID --output text --query 'Nodes[0].Id')
+   
+   # Get Peer Endpoint
+   PEER_ENDPOINT=$(aws --region $REGION managedblockchain get-node --network-id $NETWORK_ID --member-id $MEMBER_ID --node-id $NODE_ID --output text --query 'Node.FrameworkAttributes.Fabric.PeerEndpoint')
+   
+   # Output Peer Endpoint
+   echo "Peer Endpoint: $PEER_ENDPOINT"
+
    # Run docker compose
    sudo /usr/local/bin/docker-compose -f docker-compose-cli.yaml up -d
    ```
